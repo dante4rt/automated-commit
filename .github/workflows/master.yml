@@ -22,32 +22,22 @@ jobs:
 
       - name: Modify last update
         run: |
-          d=`date '+%Y-%m-%dT%H:%M:%SZ'`
-          echo Last update on $d > LAST_UPDATED.tsx
+          d=$(date '+%Y-%m-%dT%H:%M:%SZ')
+          echo "Last update on $d" > LAST_UPDATED.tsx
 
       - name: Commit changes
         run: |
           git config --local user.email "rxmxdhxni@gmail.com"
           git config --local user.name "dante4rt"
           git add -A
+          
+          arr=("chore(bot): 💀" "chore(bot): 🎹" "chore(bot): 🎼" "chore(bot): ⚙️" "chore(bot): ⚔️" "chore(bot): 💜" "chore(bot): 🌸" "chore(bot): 💍" "chore(bot): ❄️" "chore(bot): 🫧")
+          rand=$((RANDOM % ${#arr[@]}))
+          
+          git commit -m "${arr[rand]}"
 
-          arr[0]="chore(bot): 💀"
-          arr[1]="chore(bot): 🎹"
-          arr[2]="chore(bot): 🎼"
-          arr[3]="chore(bot): ⚙️"
-          arr[4]="chore(bot): ⚔️"
-          arr[5]="chore(bot): 💜"
-          arr[6]="chore(bot): 🌸"
-          arr[7]="chore(bot): 💍"
-          arr[8]="chore(bot): ❄️"
-          arr[9]="chore(bot): 🫧"
-
-          rand=$[$RANDOM % ${#arr[@]}]
-
-          git commit -m "${arr[$rand]}"
-
-      - name: GitHub Push
-        uses: ad-m/github-push-action@v0.6.0
-        with:
-          directory: '.'
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Push Changes
+        run: |
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
