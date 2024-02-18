@@ -1,4 +1,4 @@
-name: Automated Daily Commit with Emojis
+name: Automated Daily Commit
 
 on:
   schedule:
@@ -26,15 +26,10 @@ jobs:
 
       - name: Commit and Push Changes If Any
         run: |
-          emojis=("🎉" "🚀" "✨" "🔥" "🌈" "💥" "🍀" "🚀" "💫" "🎈")
-          emoji_index=$((RANDOM % 10))
-          selected_emoji=${emojis[$emoji_index]}
-          commit_message="Enhanced daily update: $(date '+%Y-%m-%d %H:%M:%S') $selected_emoji"
-
           if [[ -z $(git status --porcelain) ]]; then
             echo "No changes to commit."
           else
             git pull --rebase || echo "Rebase not required"
             git add -A
-            git commit -m "$commit_message"
+            git commit -m "Daily update: $(date '+%Y-%m-%d %H:%M:%S')"
             git push
