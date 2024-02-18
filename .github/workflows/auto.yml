@@ -1,0 +1,38 @@
+name: Automated Daily Commit with Emojis
+
+on:
+  schedule:
+    - cron: '*/1 * * * *' # Runs every minute
+
+permissions:
+  contents: write
+
+jobs:
+  commit_changes:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Update Log File
+        run: |
+          echo "Update made at $(date '+%Y-%m-%d %H:%M:%S')" > update_logs.txt
+
+      - name: Configure Git
+        run: |
+          git config --global user.email "rxmxdhxni@gmail.com"
+          git config --global user.name "dante4rt"
+
+      - name: Commit and Push Changes If Any
+        run: |
+          emojis=("🎉" "🚀" "✨" "🔥" "🌈" "💥" "🍀" "🚀" "💫" "🎈")
+          emoji_index=$(($RANDOM % ${#emojis[@]}))
+          selected_emoji=${emojis[$emoji_index]}
+          commit_message="Enhanced daily update: $(date '+%Y-%m-%d %H:%M:%S') $selected_emoji"
+
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "No changes to commit."
+          else
+            git add -A
+            git commit -m "${commit_message}"
+            git -c http.extraHeader="AUTHORIZATION: bearer ${{ secrets.GITHUB_TOKEN }}" push
