@@ -1,43 +1,48 @@
-name: Auto commit
+name: Automated Repository Update
 
 on:
   push:
-    branches:
-      - master
+    branches: [master] # Ensures the workflow triggers on pushes to master
 
   schedule:
-    - cron: '0 */12 * * *' # See https://crontab.guru/#0_7,9,11_*_*_1,3
-  workflow_dispatch:
+    - cron: '0 */12 * * *' # Executes every 12 hours
+
+  workflow_dispatch: # Allows manual triggering from the GitHub UI
 
 permissions:
-  contents: write    
+  contents: write # Grants permissions to write to the repo
 
 jobs:
-  auto_commit:
-    runs-on: ubuntu-latest
+  update_commit:
+    runs-on: ubuntu-latest # Specifies the runner
+
     steps:
-      - name: DEBUG
-        run: echo "::debug::Ref = ${{github.ref}}"
-      - uses: actions/checkout@v3
+      - name: Setup Debug Information
+        run: echo "::debug::Triggered by ref = ${{github.ref}}"
+
+      - name: Checkout Code
+        uses: actions/checkout@v3 # Latest version for optimized performance
         with:
-          persist-credentials: false
-          fetch-depth: 0
+          persist-credentials: true # Ensures credentials are available for subsequent steps
+          fetch-depth: 0 # Fetches all history for all branches and tags
 
-      - name: Modify last update
+      - name: Update Timestamp File
         run: |
-          d=$(date '+%Y-%m-%dT%H:%M:%SZ')
-          echo "Last update on $d" > LAST_UPDATED.tsx
+          current_time=$(date '+%Y-%m-%d %H:%M:%S')
+          echo "Updated on $current_time" > TIMESTAMP.txt
 
-      - name: Commit changes
+      - name: Setup Git Configuration
         run: |
-          git config --local user.email "rxmxdhxni@gmail.com"
-          git config --local user.name "dante4rt"
-          git add -A
+          git config user.email "rxmxdhxni@gmail.com"
+          git config user.name "dante4rt"
 
-          arr=("chore(bot): 💀" "chore(bot): 🎹" "chore(bot): 🎼" "chore(bot): ⚙️" "chore(bot): ⚔️" "chore(bot): 💜" "chore(bot): 🌸" "chore(bot): 💍" "chore(bot): ❄️" "chore(bot): 🫧")
-          rand=$((RANDOM % ${#arr[@]}))
+      - name: Prepare Commit
+        run: |
+          commit_messages=("Update: ⏰" "Refresh: 🔄" "Renew: 🌟" "Revise: 📝" "Amend: 🛠" "Adjust: 🔧" "Change: 📈" "Modify: 🖊" "Transform: 🌀" "Revamp: 🌈")
+          random_msg=${commit_messages[$RANDOM % ${#commit_messages[@]}]}
 
-          git commit -m "${arr[rand]}"
+          git add TIMESTAMP.txt
+          git commit -m "$random_msg - $current_time" || echo "No changes to commit."
 
       - name: GitHub Push
         uses: ad-m/github-push-action@v0.6.0
