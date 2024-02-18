@@ -2,7 +2,8 @@ name: Enhanced Daily Commit
 
 on:
   schedule:
-    - cron: '*/5 * * * *' # Adjust this schedule as needed
+    - cron: '* * * * *' # Adjust this schedule as needed
+  workflow_dispatch:
 
 permissions:
   contents: write
