@@ -2,7 +2,7 @@ name: Automated Daily Commit with Emojis
 
 on:
   schedule:
-    - cron: '* * * * *' # Runs at midnight UTC; adjust as needed
+    - cron: '*/1 * * * *' # Runs at midnight UTC; adjust as needed
   workflow_dispatch:
 
 permissions:
