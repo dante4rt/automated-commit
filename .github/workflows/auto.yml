@@ -2,7 +2,7 @@ name: Automated Daily Commit with Emojis
 
 on:
   schedule:
-    - cron: '*/1 * * * *' # Runs every minute
+    - cron: '*/1 * * * *' # Runs every minute for demonstration; adjust as needed
   workflow_dispatch:
 
 permissions:
@@ -14,10 +14,11 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history for all tags and branches
 
       - name: Update Log File
-        run: |
-          echo "Update made at $(date '+%Y-%m-%d %H:%M:%S')" > update_logs.txt
+        run: echo "Update made at $(date '+%Y-%m-%d %H:%M:%S')" > update_logs.txt
 
       - name: Configure Git
         run: |
@@ -34,6 +35,7 @@ jobs:
           if [ -z "$(git status --porcelain)" ]; then
             echo "No changes to commit."
           else
+            git pull --rebase  # Ensure the local branch is up-to-date with remote
             git add -A
             git commit -m "${commit_message}"
-            git -c http.extraHeader="AUTHORIZATION: bearer ${{ secrets.GITHUB_TOKEN }}" push
+            git push
