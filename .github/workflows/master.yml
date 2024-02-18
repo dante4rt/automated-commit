@@ -1,39 +1,53 @@
-name: Automated Daily Commit with Emojis
+name: Auto commit
 
 on:
+  push:
+    branches:
+      - master
+
   schedule:
-    - cron: '*/1 * * * *' # Runs at midnight UTC; adjust as needed
+    - cron: '0 */12 * * *' # See https://crontab.guru/#0_7,9,11_*_*_1,3
   workflow_dispatch:
 
-permissions:
-  contents: write
-
 jobs:
-  commit_changes:
+  auto_commit:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      - name: DEBUG
+        run: echo "::debug::Ref = ${{github.ref}}"
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+          fetch-depth: 0
 
-      - name: Update Log File
-        run: echo "Update made at $(date '+%Y-%m-%d %H:%M:%S')" > update_logs.txt
-
-      - name: Configure Git
+      - name: Modify last update
         run: |
-          git config --global user.email "rxmxdhxni@gmail.com"
-          git config --global user.name "dante4rt"
+          d=`date '+%Y-%m-%dT%H:%M:%SZ'`
+          echo Last update on $d > LAST_UPDATED.tsx
 
-      - name: Commit and Push Changes If Any
+      - name: Commit changes
         run: |
-          emojis=("🎉" "🚀" "✨" "🔥" "🌈" "💥" "🍀" "🚀" "💫" "🎈")
-          emoji_index=$(($RANDOM % ${#emojis[@]}))
-          selected_emoji=${emojis[$emoji_index]}
-          commit_message="Enhanced daily update: $(date '+%Y-%m-%d %H:%M:%S') $selected_emoji"
+          git config --local user.email "rxmxdhxni@gmail.com"
+          git config --local user.name "dante4rt"
+          git add -A
 
-          if [ -z "$(git status --porcelain)" ]; then
-            echo "No changes to commit."
-          else
-            git add -A
-            git commit -m "${commit_message}"
-            git -c http.extraHeader="AUTHORIZATION: bearer ${{ secrets.GITHUB_TOKEN }}" push
-          fi
+          arr[0]="chore(bot): 💀"
+          arr[1]="chore(bot): 🎹"
+          arr[2]="chore(bot): 🎼"
+          arr[3]="chore(bot): ⚙️"
+          arr[4]="chore(bot): ⚔️"
+          arr[5]="chore(bot): 💜"
+          arr[6]="chore(bot): 🌸"
+          arr[7]="chore(bot): 💍"
+          arr[8]="chore(bot): ❄️"
+          arr[9]="chore(bot): 🫧"
+
+          rand=$[$RANDOM % ${#arr[@]}]
+
+          git commit -m "${arr[$rand]}"
+
+      - name: GitHub Push
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          directory: '.'
+          github_token: ${{ secrets.GITHUB_TOKEN }}
