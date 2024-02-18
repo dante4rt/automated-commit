@@ -9,6 +9,9 @@ on:
     - cron: '0 */12 * * *' # See https://crontab.guru/#0_7,9,11_*_*_1,3
   workflow_dispatch:
 
+permissions:
+  contents: write    
+
 jobs:
   auto_commit:
     runs-on: ubuntu-latest
