@@ -1,4 +1,4 @@
-name: Automated Repository Update
+name: Automated Commit
 
 on:
   push:
