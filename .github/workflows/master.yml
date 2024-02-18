@@ -4,9 +4,8 @@ on:
   push:
     branches:
       - main
-
   schedule:
-    - cron: '0 */12 * * *' # See https://crontab.guru/#0_7,9,11_*_*_1,3
+    - cron: '0 */12 * * *'
   workflow_dispatch:
 
 jobs:
@@ -15,9 +14,10 @@ jobs:
     steps:
       - name: DEBUG
         run: echo "::debug::Ref = ${{github.ref}}"
-      - uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v3
         with:
-          persist-credentials: false
+          persist-credentials: true
           fetch-depth: 0
 
       - name: Modify last update
@@ -32,12 +32,9 @@ jobs:
           git add -A
           
           arr=("chore(bot): 💀" "chore(bot): 🎹" "chore(bot): 🎼" "chore(bot): ⚙️" "chore(bot): ⚔️" "chore(bot): 💜" "chore(bot): 🌸" "chore(bot): 💍" "chore(bot): ❄️" "chore(bot): 🫧")
-          rand=$((RANDOM % ${#arr[@]}))
+          rand=$RANDOM % ${#arr[@]}
           
           git commit -m "${arr[rand]}"
 
       - name: Push Changes
-        run: |
-          git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: git push origin main
